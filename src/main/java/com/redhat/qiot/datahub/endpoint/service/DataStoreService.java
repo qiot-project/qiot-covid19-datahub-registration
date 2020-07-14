@@ -3,7 +3,7 @@
  */
 package com.redhat.qiot.datahub.endpoint.service;
 
-import com.redhat.qiot.datahub.endpoint.domain.MeasurementStation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author abattagl
@@ -11,5 +11,13 @@ import com.redhat.qiot.datahub.endpoint.domain.MeasurementStation;
  */
 public interface DataStoreService {
 
+    String getMeasurementStation(int id) throws JsonProcessingException;
+    String getMeasurementStation(String serial) throws JsonProcessingException;
+
+    String getAllMeasurementStations() throws JsonProcessingException;
+
+    String register(String serial, double longitude, double latitude);
+
+    void unregister(int id);
 
 }
