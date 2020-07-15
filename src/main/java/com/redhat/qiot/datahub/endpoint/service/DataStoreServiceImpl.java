@@ -56,11 +56,12 @@ public class DataStoreServiceImpl implements DataStoreService {
 
     // TODO
     @Override
-    public String register(String serial, double longitude, double latitude) {
+    public String register(String serial, String name, double longitude,
+            double latitude) {
         MeasurementStation ms = msRepository.findBySerial(serial);
         int stationId;
         if (ms == null) {
-            stationId = msRepository.save(serial, longitude, latitude);
+            stationId = msRepository.save(serial, name, longitude, latitude);
         } else {
             stationId = ms.id;
             if (!ms.active)

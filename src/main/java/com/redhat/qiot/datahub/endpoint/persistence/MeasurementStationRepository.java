@@ -1,7 +1,5 @@
 package com.redhat.qiot.datahub.endpoint.persistence;
 
-import static com.mongodb.client.model.Filters.eq;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +21,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
@@ -34,9 +33,9 @@ import io.quarkus.runtime.StartupEvent;
 @ApplicationScoped
 public class MeasurementStationRepository {
 
-    private static final String DATABASE_NAME = "qiot";
+    private final String DATABASE_NAME = "qiot";
 
-    private static final String COLLECTION_NAME = "measurementstation";
+    private final String COLLECTION_NAME = "measurementstation";
 
     @Inject
     Logger LOGGER;
@@ -94,10 +93,11 @@ public class MeasurementStationRepository {
         return obj.get("seq");
     }
 
-    public int save(String serial, double longitude, double latitude) {
+    public int save(String serial, String name, double longitude, double latitude) {
         MeasurementStation ms = new MeasurementStation();
         ms.id = (int) getNextSequence("userid");
         ms.serial = serial;
+        ms.name=name;
         ms.location = new Point(
                 new Position(Arrays.asList(longitude, latitude)));
         ms.active = true;
@@ -107,7 +107,8 @@ public class MeasurementStationRepository {
 
     public MeasurementStation findById(int stationId) {
         LOGGER.debug("Searching for Measurement Station with ID {}", stationId);
-        MeasurementStation ms = msCollection.find(eq("_id", stationId)).first();
+        MeasurementStation ms = msCollection.find(Filters.eq("_id", stationId))
+                .first();
         if (ms == null)
             return null;
         LOGGER.debug("Found MeasurementStation {}", ms);
@@ -117,7 +118,7 @@ public class MeasurementStationRepository {
     public MeasurementStation findBySerial(String serial) {
         LOGGER.debug("Searching for Measurement Station with serialID {}",
                 serial);
-        MeasurementStation ms = msCollection.find(eq("serial", serial)).first();
+        MeasurementStation ms = msCollection.find(Filters.eq("serial", serial)).first();
         if (ms == null)
             return null;
         LOGGER.debug("Found MeasurementStation {}", ms);
@@ -164,14 +165,14 @@ public class MeasurementStationRepository {
     //
     public void setActive(int id) {
         // update("active='true' where id=?1", id);
-        msCollection.updateOne(eq("_id", id),
+        msCollection.updateOne(Filters.eq("_id", id),
                 new Document("$set", new Document("active", true)));
     }
 
     public void setInactive(int id) {
-//        MeasurementStation ms=findById(id);
-//        ms.active=false;
-        msCollection.updateOne(eq("_id", id),
+        // MeasurementStation ms=findById(id);
+        // ms.active=false;
+        msCollection.updateOne(Filters.eq("_id", id),
                 new Document("$set", new Document("active", false)));
     }
 }

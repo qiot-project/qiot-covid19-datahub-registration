@@ -12,6 +12,7 @@ public class MeasurementStation {
     @BsonId
     public int id;
     public String serial;
+    public String name;
     public Point location;
 //    private double longitude;
 //    private double latitude;

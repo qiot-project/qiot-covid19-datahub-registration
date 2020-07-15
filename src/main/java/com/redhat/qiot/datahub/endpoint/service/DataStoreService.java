@@ -12,11 +12,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public interface DataStoreService {
 
     String getMeasurementStation(int id) throws JsonProcessingException;
+
     String getMeasurementStation(String serial) throws JsonProcessingException;
 
     String getAllMeasurementStations() throws JsonProcessingException;
 
-    String register(String serial, double longitude, double latitude);
+    String register(String serial, String name, double longitude,
+            double latitude);
 
     void unregister(int id);
 

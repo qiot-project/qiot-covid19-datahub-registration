@@ -30,9 +30,9 @@ public class MeasurementStationActionRepository {
 
     @Inject
     Logger LOGGER;
-    private static final String DATABASE_NAME = "qiot";
+    private  final String DATABASE_NAME = "qiot";
 
-    private static final String COLLECTION_NAME = "measurementstationaction";
+    private  final String COLLECTION_NAME = "measurementstationaction";
 
     @Inject
     MongoClient mongoClient;
