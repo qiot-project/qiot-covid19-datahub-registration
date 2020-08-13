@@ -1,21 +1,25 @@
 package com.redhat.qiot.datahub.endpoint.rest;
 
+import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.redhat.qiot.datahub.endpoint.domain.station.MeasurementStation;
 import com.redhat.qiot.datahub.endpoint.service.DataStoreService;
 
 @Path("/measurementstation")
 @ApplicationScoped
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.TEXT_PLAIN)
 public class MeasurementStationResource {
 
     @Inject
@@ -25,32 +29,24 @@ public class MeasurementStationResource {
     DataStoreService dsService;
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String getById(@QueryParam("stationId") String stationId)
-            throws JsonProcessingException {
-        LOGGER.info("Received an info request for measurement station {}",
-                stationId);
-        int id = Integer.parseInt(stationId);
+    public Set<MeasurementStation> getAll() {
+        LOGGER.info("Received an info request for all measurement stations");
+        return dsService.getAllMeasurementStations();
+    }
+
+    @GET
+    @Path("/id/{id}")
+    public MeasurementStation getById(@PathParam("id") int id) {
+        LOGGER.info("Received an info request for measurement station {}", id);
         return dsService.getMeasurementStation(id);
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String getBySerial(@QueryParam("serial") String serial)
-            throws JsonProcessingException {
+    @Path("/serial/{serial}")
+    public MeasurementStation getBySerial(@PathParam("serial") String serial) {
         LOGGER.info("Received an info request for measurement station {}",
                 serial);
         return dsService.getMeasurementStation(serial);
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String getById() throws JsonProcessingException {
-        LOGGER.info("Received an info request for all measurement stations");
-        return dsService.getAllMeasurementStations();
     }
 
 }

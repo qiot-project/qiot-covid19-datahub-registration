@@ -4,12 +4,11 @@
 package com.redhat.qiot.datahub.endpoint.service;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.qiot.datahub.endpoint.domain.action.MeasurementStationAction;
 import com.redhat.qiot.datahub.endpoint.domain.action.MeasurementStationActionLevelEnum;
 import com.redhat.qiot.datahub.endpoint.domain.action.MeasurementStationActionTypeEnum;
@@ -29,34 +28,24 @@ public class DataStoreServiceImpl implements DataStoreService {
     @Inject
     MeasurementStationActionRepository msaRepository;
 
-    @Inject
-    ObjectMapper MAPPER;
-
     @Override
-    public String getMeasurementStation(int id) throws JsonProcessingException {
-        MeasurementStation ms = msRepository.findById(id);
-        if (ms == null)
-            return null;
-        return MAPPER.writeValueAsString(ms);
+    public MeasurementStation getMeasurementStation(int id)  {
+        return msRepository.findById(id);
     }
 
     @Override
-    public String getMeasurementStation(String serial)
-            throws JsonProcessingException {
-        MeasurementStation ms = msRepository.findBySerial(serial);
-        if (ms == null)
-            return null;
-        return MAPPER.writeValueAsString(ms);
+    public MeasurementStation getMeasurementStation(String serial)
+             {
+        return msRepository.findBySerial(serial);
     }
 
     @Override
-    public String getAllMeasurementStations() throws JsonProcessingException {
-        return MAPPER.writeValueAsString(msRepository.findAll());
+    public Set<MeasurementStation> getAllMeasurementStations()  {
+        return msRepository.findAll();
     }
 
-    // TODO
     @Override
-    public String register(String serial, String name, double longitude,
+    public int register(String serial, String name, double longitude,
             double latitude) {
         MeasurementStation ms = msRepository.findBySerial(serial);
         int stationId;
@@ -68,7 +57,7 @@ public class DataStoreServiceImpl implements DataStoreService {
                 msRepository.setActive(ms.id);
         }
         recordRegister(stationId);
-        return Integer.toString(stationId);
+        return stationId;
     }
 
     @Override

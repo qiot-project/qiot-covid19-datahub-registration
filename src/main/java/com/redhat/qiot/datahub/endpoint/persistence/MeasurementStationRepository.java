@@ -3,6 +3,8 @@ package com.redhat.qiot.datahub.endpoint.persistence;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -125,13 +127,13 @@ public class MeasurementStationRepository {
         return ms;
     }
 
-    public List<MeasurementStation> findAll() {
+    public Set<MeasurementStation> findAll() {
         LOGGER.debug("Searching for all Measurement Stations");
-        List<MeasurementStation> mss = new ArrayList<MeasurementStation>(
-                (int) msCollection.countDocuments());
+        Set<MeasurementStation> mss = new TreeSet<>();
         for (MeasurementStation ms : msCollection.find()) {
             mss.add(ms);
         }
+        LOGGER.info(Arrays.toString(mss.toArray(new MeasurementStation[0])));
         return mss;
     }
 
