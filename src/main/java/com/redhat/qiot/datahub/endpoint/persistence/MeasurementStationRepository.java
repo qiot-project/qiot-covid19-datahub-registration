@@ -1,8 +1,6 @@
 package com.redhat.qiot.datahub.endpoint.persistence;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,6 +14,7 @@ import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 
 import com.mongodb.BasicDBObject;
@@ -28,6 +27,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import com.redhat.qiot.datahub.endpoint.domain.station.Counters;
 import com.redhat.qiot.datahub.endpoint.domain.station.MeasurementStation;
 
 import io.quarkus.runtime.StartupEvent;
@@ -35,9 +35,13 @@ import io.quarkus.runtime.StartupEvent;
 @ApplicationScoped
 public class MeasurementStationRepository {
 
-    private final String DATABASE_NAME = "qiot";
+    @ConfigProperty(name = "qiot.database.name")
+    String DATABASE_NAME;
 
-    private final String COLLECTION_NAME = "measurementstation";
+    @ConfigProperty(name = "qiot.collection.measurementstation.name")
+    String MS_COLLECTION_NAME;
+    @ConfigProperty(name = "qiot.collection.counters.name")
+    String COUNTERS_COLLECTION_NAME;
 
     @Inject
     Logger LOGGER;
@@ -46,6 +50,7 @@ public class MeasurementStationRepository {
     MongoClient mongoClient;
 
     MongoDatabase qiotDatabase;
+    MongoCollection<Counters> countersCollection = null;
     MongoCollection<MeasurementStation> msCollection = null;
     CodecProvider pojoCodecProvider;
     CodecRegistry pojoCodecRegistry;
@@ -55,13 +60,36 @@ public class MeasurementStationRepository {
 
     @PostConstruct
     void init() {
+
+        /*
+         * Instantiate COUNTERS collection
+         */
         qiotDatabase = mongoClient.getDatabase(DATABASE_NAME);
         try {
-            qiotDatabase.createCollection(COLLECTION_NAME);
+            qiotDatabase.createCollection(COUNTERS_COLLECTION_NAME);
         } catch (Exception e) {
-            LOGGER.info("Collection {} already exists", COLLECTION_NAME);
+            LOGGER.info("Collection {} already exists",
+                    COUNTERS_COLLECTION_NAME);
         }
-        msCollection = qiotDatabase.getCollection(COLLECTION_NAME,
+        countersCollection = qiotDatabase
+                .getCollection(COUNTERS_COLLECTION_NAME, Counters.class);
+        if (countersCollection.countDocuments() == 0) {
+            Counters c=new Counters();
+            c.id="userid";
+            c.seq=0;
+            countersCollection.insertOne(c);
+        }
+
+        /*
+         * Instantiate MEASUREMENT STATION collection
+         */
+        qiotDatabase = mongoClient.getDatabase(DATABASE_NAME);
+        try {
+            qiotDatabase.createCollection(MS_COLLECTION_NAME);
+        } catch (Exception e) {
+            LOGGER.info("Collection {} already exists", MS_COLLECTION_NAME);
+        }
+        msCollection = qiotDatabase.getCollection(MS_COLLECTION_NAME,
                 MeasurementStation.class);
         /*
          * ensure indexes exist
@@ -95,11 +123,12 @@ public class MeasurementStationRepository {
         return obj.get("seq");
     }
 
-    public int save(String serial, String name, double longitude, double latitude) {
+    public int save(String serial, String name, double longitude,
+            double latitude) {
         MeasurementStation ms = new MeasurementStation();
         ms.id = (int) getNextSequence("userid");
         ms.serial = serial;
-        ms.name=name;
+        ms.name = name;
         ms.location = new Point(
                 new Position(Arrays.asList(longitude, latitude)));
         ms.active = true;
@@ -120,7 +149,8 @@ public class MeasurementStationRepository {
     public MeasurementStation findBySerial(String serial) {
         LOGGER.debug("Searching for Measurement Station with serialID {}",
                 serial);
-        MeasurementStation ms = msCollection.find(Filters.eq("serial", serial)).first();
+        MeasurementStation ms = msCollection.find(Filters.eq("serial", serial))
+                .first();
         if (ms == null)
             return null;
         LOGGER.debug("Found MeasurementStation {}", ms);
