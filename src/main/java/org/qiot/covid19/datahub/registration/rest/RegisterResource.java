@@ -2,16 +2,18 @@ package org.qiot.covid19.datahub.registration.rest;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.qiot.covid19.datahub.registration.service.DataStoreService;
-import org.slf4j.Logger;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.qiot.covid19.datahub.registration.service.CertificateService;
+import org.qiot.covid19.datahub.registration.service.RegistrationService;
 
 @Path("/register")
 @ApplicationScoped
@@ -20,64 +22,48 @@ import org.slf4j.Logger;
 public class RegisterResource {
 
     @Inject
-    Logger LOGGER;
-
+    RegistrationService registrationService;
     @Inject
-    DataStoreService dsService;
+    CertificateService certificateService;
 
-    // @PUT
-    // public int register(@QueryParam("stationData") String stationData) {
-    // if (LOGGER.isDebugEnabled()) {
-    // LOGGER.debug("register(String) - start");
-    // }
-    //
-    // String serial, name;
-    // double longitude, latitude;
-    //
-    // JsonObject jsonObject = null;
-    // try (JsonReader reader = Json
-    // .createReader(new StringReader(stationData));) {
-    // jsonObject = reader.readObject();
-    // serial = jsonObject.getString("serial");
-    // name = jsonObject.getString("name");
-    // longitude = jsonObject.getJsonNumber("lon").doubleValue();
-    // latitude = jsonObject.getJsonNumber("lat").doubleValue();
-    // }
-    // int returnint = dsService.register(serial, name, longitude, latitude);
-    // if (LOGGER.isDebugEnabled()) {
-    // LOGGER.debug("register(String) - end");
-    // }
-    // return returnint;
-    // }
-
+    @Transactional
     @PUT
-    @Path("/serial/{serial}/name/{name}/longitude/{longitude}/latitude/{latitude}")
-    public int register(@PathParam("serial") String serial,
-            @PathParam("name") String name,
-            @PathParam("longitude") double longitude,
-            @PathParam("latitude") double latitude) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("register(String) - start");
-        }
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    public MultipartFormDataOutput register(
+            @QueryParam("serial") @NotNull String serial,
+            @QueryParam("name") @NotNull String name,
+            @QueryParam("longitude") double longitude,
+            @QueryParam("latitude") double latitude) throws Exception {
+        MultipartFormDataOutput output = new MultipartFormDataOutput();
+        output.addPart(certificateService.provision(),
+                MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        output.addPart(
+                registrationService.register(serial, name, longitude, latitude),
+                MediaType.TEXT_PLAIN_TYPE);
 
-        int returnint = dsService.register(serial, name, longitude, latitude);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("register(String) - end");
-        }
-        return returnint;
+        // return Response.ok(output,
+        // MediaType.MULTIPART_FORM_DATA_TYPE).build();
+        return output;
     }
 
-    @DELETE
-    @Path("/id/{id}")
-    public void unregister(@PathParam("id") int id) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("unregister(int) - start");
-        }
-
-        dsService.unregister(id);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("unregister(int) - end");
-        }
-    }
+    // @Transactional
+    // @PUT
+    // @Consumes(MediaType.TEXT_PLAIN)
+    // @Produces(MediaType.MULTIPART_FORM_DATA)
+    // public MultipartBody register(@QueryParam("serial") @NotNull String
+    // serial,
+    // @QueryParam("name") @NotNull String name,
+    // @QueryParam("longitude") double longitude,
+    // @QueryParam("latitude") double latitude) throws Exception {
+    // MultipartBody response = new MultipartBody();
+    //
+    // // Register the station through the station-service
+    // response.id = registrationService.register(serial, name, longitude,
+    // latitude);
+    // // Provision the trust store through the cert-issuer
+    // response.ts = certificateService.provision();
+    //
+    // return response;
+    // }
 }
