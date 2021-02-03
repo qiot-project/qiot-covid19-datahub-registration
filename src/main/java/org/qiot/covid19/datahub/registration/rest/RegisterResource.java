@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.qiot.covid19.datahub.registration.service.CertificateService;
@@ -30,21 +31,18 @@ public class RegisterResource {
     @PUT
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.MULTIPART_FORM_DATA)
-    public MultipartFormDataOutput register(
-            @QueryParam("serial") @NotNull String serial,
+    public Response register(@QueryParam("serial") @NotNull String serial,
             @QueryParam("name") @NotNull String name,
             @QueryParam("longitude") double longitude,
             @QueryParam("latitude") double latitude) throws Exception {
         MultipartFormDataOutput output = new MultipartFormDataOutput();
-        output.addPart(certificateService.provision(),
+        output.addFormData("ts", certificateService.provision(),
                 MediaType.APPLICATION_OCTET_STREAM_TYPE);
-        output.addPart(
+        output.addFormData("id",
                 registrationService.register(serial, name, longitude, latitude),
                 MediaType.TEXT_PLAIN_TYPE);
 
-        // return Response.ok(output,
-        // MediaType.MULTIPART_FORM_DATA_TYPE).build();
-        return output;
+        return Response.ok(output, MediaType.MULTIPART_FORM_DATA_TYPE).build();
     }
 
     // @Transactional
