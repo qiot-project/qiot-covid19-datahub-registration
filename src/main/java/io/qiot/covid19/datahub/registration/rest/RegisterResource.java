@@ -1,4 +1,4 @@
-package org.qiot.covid19.datahub.registration.rest;
+package io.qiot.covid19.datahub.registration.rest;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,8 +13,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
-import org.qiot.covid19.datahub.registration.service.CertificateService;
-import org.qiot.covid19.datahub.registration.service.RegistrationService;
+
+import io.qiot.covid19.datahub.registration.domain.TruststoreBean;
+import io.qiot.covid19.datahub.registration.service.CertificateService;
+import io.qiot.covid19.datahub.registration.service.RegistrationService;
 
 @Path("/register")
 @ApplicationScoped
@@ -36,8 +38,12 @@ public class RegisterResource {
             @QueryParam("longitude") double longitude,
             @QueryParam("latitude") double latitude) throws Exception {
         MultipartFormDataOutput output = new MultipartFormDataOutput();
-        output.addFormData("ts", certificateService.provision(),
+        TruststoreBean truststoreBean = certificateService.provision();
+        output.addFormData("ts", truststoreBean.is,
                 MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        output.addFormData("tspass",
+                truststoreBean.password,
+                MediaType.TEXT_PLAIN_TYPE);
         output.addFormData("id",
                 registrationService.register(serial, name, longitude, latitude),
                 MediaType.TEXT_PLAIN_TYPE);

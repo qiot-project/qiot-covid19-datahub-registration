@@ -2,7 +2,7 @@
  * 
  */
 
-package org.qiot.covid19.datahub.registration.client;
+package io.qiot.covid19.datahub.registration.client;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;

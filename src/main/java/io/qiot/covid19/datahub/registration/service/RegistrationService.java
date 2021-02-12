@@ -1,14 +1,15 @@
 /**
  * 
  */
-package org.qiot.covid19.datahub.registration.service;
+package io.qiot.covid19.datahub.registration.service;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.qiot.covid19.datahub.registration.client.StationServiceClient;
 import org.slf4j.Logger;
+
+import io.qiot.covid19.datahub.registration.client.StationServiceClient;
 
 /**
  * @author abattagl

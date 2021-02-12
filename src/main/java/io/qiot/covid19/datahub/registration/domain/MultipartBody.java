@@ -1,3 +1,4 @@
+package io.qiot.covid19.datahub.registration.domain;
 //package org.qiot.covid19.datahub.registration.domain;
 //
 //import java.io.InputStream;

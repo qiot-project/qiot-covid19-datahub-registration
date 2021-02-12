@@ -1,4 +1,4 @@
-package org.qiot.covid19.datahub.registration.util;
+package io.qiot.covid19.datahub.registration.util;
 
 
 import javax.enterprise.context.ApplicationScoped;

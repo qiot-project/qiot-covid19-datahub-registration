@@ -1,3 +1,4 @@
+package io.qiot.covid19.datahub.registration.persistence;
 //package org.qiot.covid19.datahub.registration.persistence;
 //
 //import java.util.Date;
