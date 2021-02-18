@@ -3,65 +3,85 @@ package org.qiot.covid19.datahub.registration.rest;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.spi.NotImplementedYetException;
+import org.qiot.covid19.datahub.registration.client.StationServiceClient;
+import org.qiot.covid19.datahub.registration.rest.beans.RegisterRequest;
+import org.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
 import org.qiot.covid19.datahub.registration.service.CertificateService;
-import org.qiot.covid19.datahub.registration.service.RegistrationService;
+import org.slf4j.Logger;
 
 @Path("/register")
 @ApplicationScoped
-@Produces(MediaType.TEXT_PLAIN)
-@Consumes(MediaType.TEXT_PLAIN)
 public class RegisterResource {
 
     @Inject
-    RegistrationService registrationService;
+    @RestClient
+    StationServiceClient stationServiceClient;
     @Inject
     CertificateService certificateService;
 
-    @Transactional
-    @PUT
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.MULTIPART_FORM_DATA)
-    public Response register(@QueryParam("serial") @NotNull String serial,
-            @QueryParam("name") @NotNull String name,
-            @QueryParam("longitude") double longitude,
-            @QueryParam("latitude") double latitude) throws Exception {
-        MultipartFormDataOutput output = new MultipartFormDataOutput();
-        output.addFormData("ts", certificateService.provision(),
-                MediaType.APPLICATION_OCTET_STREAM_TYPE);
-        output.addFormData("id",
-                registrationService.register(serial, name, longitude, latitude),
-                MediaType.TEXT_PLAIN_TYPE);
+    @Inject
+    Logger LOGGER;
 
-        return Response.ok(output, MediaType.MULTIPART_FORM_DATA_TYPE).build();
+    /**
+     * Creates a new instance of a `RegisterRequest`.
+     */
+    @Transactional
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response register(RegisterRequest data) throws Exception {
+        LOGGER.debug("Received registerRequest: {}", data);
+
+        RegisterResponse response = certificateService.provision(data);
+
+        response.setId(
+                stationServiceClient.add(data.getSerial(), data.getName(), data.getLongitude(), data.getLongitude()));
+
+        LOGGER.debug("Create response: {}", response);
+        return Response.ok(response, MediaType.APPLICATION_JSON).build();
     }
 
-    // @Transactional
-    // @PUT
-    // @Consumes(MediaType.TEXT_PLAIN)
-    // @Produces(MediaType.MULTIPART_FORM_DATA)
-    // public MultipartBody register(@QueryParam("serial") @NotNull String
-    // serial,
-    // @QueryParam("name") @NotNull String name,
-    // @QueryParam("longitude") double longitude,
-    // @QueryParam("latitude") double latitude) throws Exception {
-    // MultipartBody response = new MultipartBody();
-    //
-    // // Register the station through the station-service
-    // response.id = registrationService.register(serial, name, longitude,
-    // latitude);
-    // // Provision the trust store through the cert-issuer
-    // response.ts = certificateService.provision();
-    //
-    // return response;
-    // }
+    /**
+     * Gets the details of a single instance of a `RegisterRequest`.
+     */
+    @Path("/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRegister(String id) {
+        throw new NotImplementedYetException();
+    }
+
+
+   /**
+    * Updates an existing `RegisterRequest`.
+    */
+    @Path("/{id}")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateRegisterRequest(RegisterRequest data) {
+        throw new NotImplementedYetException();
+    }
+
+   /**
+    * Deletes an existing `RegisterRequest`.
+    */
+    @Path("/{id}")
+    @DELETE
+    public void deleteRegisterRequest() {
+        throw new NotImplementedYetException();
+    }
+
 }
