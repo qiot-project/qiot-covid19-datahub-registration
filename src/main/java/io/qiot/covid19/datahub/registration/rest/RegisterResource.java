@@ -64,24 +64,24 @@ public class RegisterResource {
         throw new NotImplementedYetException();
     }
 
-    /**
-     * Updates an existing `RegisterRequest`.
-     */
-    @Path("/{id}")
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateRegisterRequest(RegisterRequest data) {
-        throw new NotImplementedYetException();
-    }
-
-    /**
-     * Deletes an existing `RegisterRequest`.
-     */
-    @Path("/{id}")
-    @DELETE
-    public void deleteRegisterRequest() {
-        throw new NotImplementedYetException();
-    }
+//    /**
+//     * Updates an existing `RegisterRequest`.
+//     */
+//    @Path("/{id}")
+//    @PUT
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response updateRegisterRequest(RegisterRequest data) {
+//        throw new NotImplementedYetException();
+//    }
+//
+//    /**
+//     * Deletes an existing `RegisterRequest`.
+//     */
+//    @Path("/{id}")
+//    @DELETE
+//    public void deleteRegisterRequest() {
+//        throw new NotImplementedYetException();
+//    }
 
 }
