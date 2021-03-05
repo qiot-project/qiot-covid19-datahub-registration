@@ -33,6 +33,7 @@ public class CertificateServiceConfiguration {
     public CertificateService certManagerCertificateService(
             CertificateOperation certificateOperation,
             SecretOperation secretOperation) {
+        LOGGER.debug("Cert Manager provisioning is enabled.");
         return new CertManagerCertificateService(certificateOperation,
                 secretOperation, LOGGER, issuer, domain);
     }
@@ -40,6 +41,7 @@ public class CertificateServiceConfiguration {
     @Produces
     @DefaultBean
     public CertificateService defaultCertificateService() {
+        LOGGER.debug("Self-signed certificate provisioning is enabled.");
         return new DefaultCertificateService(LOGGER);
     }
 }
