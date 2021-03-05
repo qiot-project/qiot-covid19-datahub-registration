@@ -34,7 +34,8 @@ public class DefaultCertificateService implements CertificateService {
     }
 
     @Override
-    public RegisterResponse provision(RegisterRequest data) {
+    public RegisterResponse provision(RegisterRequest data)
+            throws CertificateProvisionException {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
