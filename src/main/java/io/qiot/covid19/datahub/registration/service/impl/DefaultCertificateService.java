@@ -13,6 +13,7 @@ import javax.enterprise.inject.Typed;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
+import io.qiot.covid19.datahub.registration.exception.CertificateProvisionException;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterRequest;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
 import io.qiot.covid19.datahub.registration.service.CertificateService;
@@ -45,7 +46,7 @@ public class DefaultCertificateService implements CertificateService {
             return RegisterResponse.builder().keystore(content)
                     .truststore(content).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CertificateProvisionException(e);
         }
     }
 

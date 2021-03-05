@@ -19,6 +19,7 @@ import io.qiot.covid19.datahub.registration.certmanager.api.model.ObjectReferenc
 import io.qiot.covid19.datahub.registration.certmanager.api.model.PasswordSecretRefSpec;
 import io.qiot.covid19.datahub.registration.certmanager.client.CertificateOperation;
 import io.qiot.covid19.datahub.registration.certmanager.client.SecretOperation;
+import io.qiot.covid19.datahub.registration.exception.CertificateProvisionException;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterRequest;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
 import io.qiot.covid19.datahub.registration.service.CertificateService;
@@ -53,7 +54,8 @@ public class CertManagerCertificateService implements CertificateService {
     }
 
     @Override
-    public RegisterResponse provision(RegisterRequest data) {
+    public RegisterResponse provision(RegisterRequest data)
+            throws CertificateProvisionException {
         final String name = data.getName();
         final String commonName = name + "."
                 + certificateOperation.getNamespace() + domain;
