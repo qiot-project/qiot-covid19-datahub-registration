@@ -42,7 +42,7 @@ public class RegisterResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response register(RegisterRequest data) throws Exception {
+    public RegisterResponse register(RegisterRequest data) throws Exception {
         LOGGER.debug("Received registerRequest: {}", data);
 
         RegisterResponse response = certificateService.provision(data);
@@ -57,7 +57,7 @@ public class RegisterResource {
                 response.getId(), data);
 
         LOGGER.debug("Create response: {}", response);
-        return Response.ok(response, MediaType.APPLICATION_JSON).build();
+        return response;
     }
 
     // /**

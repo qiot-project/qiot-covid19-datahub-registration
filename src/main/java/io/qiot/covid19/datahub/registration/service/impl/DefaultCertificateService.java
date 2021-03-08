@@ -39,13 +39,17 @@ public class DefaultCertificateService implements CertificateService {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        try (InputStream certFile = loader.getResourceAsStream("client.ts")) {
-            LOGGER.debug("input stream of the trust store: {}", certFile);
+        try (InputStream tsIs = loader.getResourceAsStream("client.ts");
+                InputStream ksIs = loader.getResourceAsStream("client.ks")) {
+            LOGGER.debug("input stream of the Client KEY store: {}", ksIs);
+            LOGGER.debug("input stream of the Client TRUST store: {}", tsIs);
 
-            String content = Base64.getEncoder()
-                    .encodeToString(IOUtils.toByteArray(certFile));
-            return RegisterResponse.builder().keystore(content)
-                    .truststore(content).build();
+            return RegisterResponse.builder()
+                    .keystore(Base64.getEncoder()
+                            .encodeToString(IOUtils.toByteArray(ksIs)))
+                    .truststore(Base64.getEncoder()
+                            .encodeToString(IOUtils.toByteArray(tsIs)))
+                    .build();
         } catch (IOException e) {
             throw new CertificateProvisionException(e);
         }
