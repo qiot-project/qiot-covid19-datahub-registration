@@ -39,8 +39,8 @@ public class DefaultCertificateService implements CertificateService {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-        try (InputStream tsIs = loader.getResourceAsStream("client.ts");
-                InputStream ksIs = loader.getResourceAsStream("client.ks")) {
+        try (InputStream tsIs = loader.getResourceAsStream("certs/mqtts/client.ts");
+                InputStream ksIs = loader.getResourceAsStream("certs/mqtts/client.ks")) {
             LOGGER.debug("input stream of the Client KEY store: {}", ksIs);
             LOGGER.debug("input stream of the Client TRUST store: {}", tsIs);
 
