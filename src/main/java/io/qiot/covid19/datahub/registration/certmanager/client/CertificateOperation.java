@@ -2,6 +2,7 @@ package io.qiot.covid19.datahub.registration.certmanager.client;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -14,6 +15,7 @@ import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -26,6 +28,7 @@ import io.qiot.covid19.datahub.registration.certmanager.api.model.Constants;
 import io.qiot.covid19.datahub.registration.certmanager.api.model.KeystoreSpec;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.subscription.UniEmitter;
 
 /**
  * @author mmascia
@@ -34,7 +37,7 @@ import io.smallrye.mutiny.Uni;
 public class CertificateOperation {
 
 
-	@ConfigProperty(name = "quarkus.kubernetes-client.namespace")
+    @ConfigProperty(name = "quarkus.kubernetes-client.namespace")
     String namespace;
 
     @ConfigProperty(name = "qiot.cert-manager.wait.duration")
@@ -72,40 +75,58 @@ public class CertificateOperation {
 
     public RegisterResponse isReady(String name) {
 
-        Uni<RegisterResponse> uni = Uni.createFrom().emitter( em -> {
-
-            this.operation().withName(name).watch(new Watcher<Certificate>() {
-                @Override
-                public void eventReceived(Action action, Certificate resource) {
-                    LOGGER.info("Watching: {}", resource);
-                    List<Condition> conditions = resource.getStatus().getConditions();
-                    if (conditions.size() > 0) {
-                        Condition condition = conditions.get(0);
-                        if ("True".equals(condition.getStatus())) {
-                            Secret secret = kubernetesClient.secrets()
-                                .inNamespace(namespace)
-                                .withName(resource.getSpec().getSecretName())
-                                .get();
-        
-                            RegisterResponse registerResponse = RegisterResponse.builder()
-                                .keystore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
-                                .truststore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
-                            .build();
-                            em.complete(registerResponse);
-                            LOGGER.info("Certificate Ready: {}", resource);
-                        }
-                    }
-                }
-        
-                @Override
-                public void onClose(WatcherException cause) {
-                    LOGGER.error("Watch Error: {}", cause);
-                    em.fail(cause);
-                }
-            });
+        Uni<RegisterResponse> uni = Uni.createFrom().emitter(em ->  {
+            CertificateWatcher watcher = new CertificateWatcher(em);
+            Watch watch = this.operation().withName(name).watch(watcher);
+            watcher.setWatch(watch);
         });
 
         return uni.await().atMost(Duration.ofSeconds(duration));
+    }
+
+    private final class CertificateWatcher implements Watcher<Certificate> {
+        private final UniEmitter<? super RegisterResponse> em;
+        private Watch watch;
+
+        private CertificateWatcher(UniEmitter<? super RegisterResponse> em) {
+            this.em = em;
+        }
+
+        public void setWatch(Watch watch) {
+            this.watch = watch;
+        }
+
+        @Override
+        public void eventReceived(Action action, Certificate resource) {
+            if(this.watch != null && Action.MODIFIED.equals(action)) {
+                String name = resource.getMetadata().getName();
+                LOGGER.info("Watch Certificate {}: {}", action, name);
+                List<Condition> conditions = resource.getStatus().getConditions();
+                if (conditions.size() > 0) {
+                    Condition condition = conditions.get(0);
+                    if ("True".equals(condition.getStatus())) {
+                        Secret secret = kubernetesClient.secrets()
+                            .inNamespace(namespace)
+                            .withName(resource.getSpec().getSecretName())
+                            .get();
+            
+                        RegisterResponse registerResponse = RegisterResponse.builder()
+                            .keystore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
+                            .truststore(secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12))
+                        .build();
+                        em.complete(registerResponse);
+                        LOGGER.debug("Certificate {} is ready: {}", name, resource);
+                        watch.close();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onClose(WatcherException cause) {
+            LOGGER.error("Watch Error: {}", cause);
+            em.fail(cause);
+        }
     }
 
 }

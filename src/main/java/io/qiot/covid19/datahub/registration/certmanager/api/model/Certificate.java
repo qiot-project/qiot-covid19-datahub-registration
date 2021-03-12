@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder({ "apiVersion", "kind", "metadata", "spec", "status" })
 @Version(Constants.VERSION)
 @Group(Constants.RESOURCE_GROUP_NAME)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @RegisterForReflection
 @NoArgsConstructor
@@ -126,5 +126,15 @@ public class Certificate
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected CertificateSpec initSpec() {
+        return new CertificateSpec();
+    }
+
+    @Override
+    protected CertificateStatus initStatus() {
+        return new CertificateStatus();
     }
 }
