@@ -38,8 +38,11 @@ public class KeystoreSpec implements UnknownPropertyPreserving, Serializable {
     public static final String JKS = "jks";
     public static final String P12 = "p12";
     public static final String KEYSTORE = "keystore";
+    public static final String TRUSTSTORE = "truststore";
     public static final String KEYSTORE_KEY_JKS = KEYSTORE + "." + JKS;
     public static final String KEYSTORE_KEY_P12 = KEYSTORE + "." + P12;
+    public static final String TRUSTSTORE_KEY_JKS = TRUSTSTORE + "." + JKS;
+    public static final String TRUSTSTORE_KEY_P12 = TRUSTSTORE + "." + P12;
 
     private Map<String, Object> additionalProperties = new HashMap<>(0);
 

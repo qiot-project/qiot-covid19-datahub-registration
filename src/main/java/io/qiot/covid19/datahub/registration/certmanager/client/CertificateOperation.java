@@ -112,7 +112,7 @@ public class CertificateOperation {
             
                         RegisterResponse registerResponse = RegisterResponse.builder()
                             .keystore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
-                            .truststore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
+                            .truststore(secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12))
                         .build();
                         em.complete(registerResponse);
                         LOGGER.debug("Certificate {} is ready: {}", name, resource);
