@@ -1,10 +1,17 @@
 
 package io.qiot.covid19.datahub.registration.rest.beans;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+//import com.fasterxml.jackson.annotation.JsonInclude;
+//import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+//import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.ToString;
 
@@ -14,65 +21,76 @@ import lombok.ToString;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "serial", "name", "longitude", "latitude",
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonbPropertyOrder({ "serial", "name", "longitude", "latitude",
         "keyStorePassword" })
 @ToString
 public class RegisterRequest {
 
-    @JsonProperty("serial")
+    @JsonbProperty(value = "serial", nillable = false)
     private String serial;
-    @JsonProperty("name")
+    
+    @JsonbProperty(value = "name", nillable = false)
+    @NotNull
+    @Pattern(regexp = "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*")
     private String name;
-    @JsonProperty("longitude")
-    private Double longitude;
-    @JsonProperty("latitude")
-    private Double latitude;
+    
+    @JsonbProperty(value = "longitude", nillable = false)
+    @DecimalMin(value="-180.0")
+    @DecimalMax(value="180.0")
+    @NotNull
+    private double longitude;
+    
+    @JsonbProperty(value = "latitude", nillable = false)
+    @DecimalMin(value="-90.0")
+    @DecimalMax(value="90.0")
+    @NotNull
+    private double latitude;
     /**
      * KeyStore Password
      * 
      */
-    @JsonProperty("keyStorePassword")
-    @JsonPropertyDescription("KeyStore Password")
+    @JsonbProperty("keyStorePassword")
+//    @JsonbPropertyDescription("KeyStore Password")
     private String keyStorePassword;
 
-    @JsonProperty("serial")
+    @JsonbProperty("serial")
     public String getSerial() {
         return serial;
     }
 
-    @JsonProperty("serial")
+    @JsonbProperty("serial")
     public void setSerial(String serial) {
         this.serial = serial;
     }
 
-    @JsonProperty("name")
+    @JsonbProperty("name")
     public String getName() {
         return name;
     }
 
-    @JsonProperty("name")
+    @JsonbProperty("name")
     public void setName(String name) {
         this.name = name;
     }
 
-    @JsonProperty("longitude")
-    public Double getLongitude() {
+    @JsonbProperty("longitude")
+    public double getLongitude() {
         return longitude;
     }
 
-    @JsonProperty("longitude")
-    public void setLongitude(Double longitude) {
+    @JsonbProperty("longitude")
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    @JsonProperty("latitude")
-    public Double getLatitude() {
+    @JsonbProperty("latitude")
+    public double getLatitude() {
         return latitude;
     }
 
-    @JsonProperty("latitude")
-    public void setLatitude(Double latitude) {
+    @JsonbProperty("latitude")
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
@@ -80,7 +98,7 @@ public class RegisterRequest {
      * KeyStore Password
      * 
      */
-    @JsonProperty("keyStorePassword")
+    @JsonbProperty("keyStorePassword")
     public String getKeyStorePassword() {
         return keyStorePassword;
     }
@@ -89,7 +107,7 @@ public class RegisterRequest {
      * KeyStore Password
      * 
      */
-    @JsonProperty("keyStorePassword")
+    @JsonbProperty("keyStorePassword")
     public void setKeyStorePassword(String keyStorePassword) {
         this.keyStorePassword = keyStorePassword;
     }

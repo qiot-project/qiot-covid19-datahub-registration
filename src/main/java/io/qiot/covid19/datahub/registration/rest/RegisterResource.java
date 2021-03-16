@@ -1,20 +1,24 @@
 package io.qiot.covid19.datahub.registration.rest;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.resteasy.spi.NotImplementedYetException;
+import org.jboss.resteasy.microprofile.client.DefaultResponseExceptionMapper;
 import org.slf4j.Logger;
 
 import io.qiot.covid19.datahub.registration.client.StationServiceClient;
@@ -22,6 +26,7 @@ import io.qiot.covid19.datahub.registration.rest.beans.RegisterRequest;
 import io.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
 import io.qiot.covid19.datahub.registration.service.CertificateService;
 
+@RegisterProvider(DefaultResponseExceptionMapper.class)
 @Path("/register")
 @ApplicationScoped
 public class RegisterResource {
@@ -31,6 +36,9 @@ public class RegisterResource {
     StationServiceClient stationServiceClient;
     @Inject
     CertificateService certificateService;
+    
+    @Inject
+    Validator validator;
 
     @Inject
     Logger LOGGER;
@@ -42,8 +50,12 @@ public class RegisterResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public RegisterResponse register(RegisterRequest data) throws Exception {
+    public RegisterResponse register(@Valid RegisterRequest data)
+            throws Exception {
         LOGGER.debug("Received registerRequest: {}", data);
+        
+//        Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(data);
+//        if (!violations.isEmpty()) throw new ValidationException(Arrays.deepToString(violations.toArray()));
 
         RegisterResponse response = certificateService.provision(data);
         LOGGER.debug(
@@ -51,7 +63,7 @@ public class RegisterResource {
                 data);
 
         response.setId(stationServiceClient.add(data.getSerial(),
-                data.getName(), data.getLongitude(), data.getLongitude()));
+                data.getName(), data.getLongitude(), data.getLatitude()));
         LOGGER.debug(
                 "Successfully provisioned a new station ID ({}) for the registration request \n{}",
                 response.getId(), data);

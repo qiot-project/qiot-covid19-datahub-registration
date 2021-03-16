@@ -1,10 +1,13 @@
 
 package io.qiot.covid19.datahub.registration.rest.beans;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+
+//import com.fasterxml.jackson.annotation.JsonInclude;
+//import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+//import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Builder;
 import lombok.ToString;
@@ -12,8 +15,8 @@ import lombok.ToString;
 /**
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "id", "truststore", "keystore" })
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonbPropertyOrder({ "id", "truststore", "keystore" })
 @Builder
 @ToString
 public class RegisterResponse {
@@ -23,24 +26,24 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("id")
-    @JsonPropertyDescription("")
+    @JsonbProperty("id")
+//    @JsonbPropertyDescription("")
     private String id;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("truststore")
-    @JsonPropertyDescription("")
+    @JsonbProperty("truststore")
+//    @JsonbPropertyDescription("")
     private String truststore;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("keystore")
-    @JsonPropertyDescription("")
+    @JsonbProperty("keystore")
+//    @JsonbPropertyDescription("")
     private String keystore;
 
     /**
@@ -48,7 +51,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("id")
+    @JsonbProperty("id")
     public String getId() {
         return id;
     }
@@ -58,7 +61,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("id")
+    @JsonbProperty("id")
     public void setId(String id) {
         this.id = id;
     }
@@ -68,7 +71,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("truststore")
+    @JsonbProperty("truststore")
     public String getTruststore() {
         return truststore;
     }
@@ -78,7 +81,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("truststore")
+    @JsonbProperty("truststore")
     public void setTruststore(String truststore) {
         this.truststore = truststore;
     }
@@ -88,7 +91,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("keystore")
+    @JsonbProperty("keystore")
     public String getKeystore() {
         return keystore;
     }
@@ -98,7 +101,7 @@ public class RegisterResponse {
      * (Required)
      * 
      */
-    @JsonProperty("keystore")
+    @JsonbProperty("keystore")
     public void setKeystore(String keystore) {
         this.keystore = keystore;
     }
