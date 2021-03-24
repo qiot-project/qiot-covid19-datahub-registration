@@ -127,14 +127,4 @@ public class Certificate
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    protected CertificateSpec initSpec() {
-        return new CertificateSpec();
-    }
-
-    @Override
-    protected CertificateStatus initStatus() {
-        return new CertificateStatus();
-    }
 }
