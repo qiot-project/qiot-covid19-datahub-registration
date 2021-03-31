@@ -54,10 +54,10 @@ public class CertManagerCertificateService implements CertificateService {
     }
 
     @Override
-    public RegisterResponse provision(RegisterRequest data)
+    public RegisterResponse provision(RegisterRequest data, String id)
             throws CertificateProvisionException {
-        final String name = data.getName();
-        final String commonName = name + "."
+        final String name = id; // unique name
+        final String commonName = data.getName() + "."
                 + certificateOperation.getNamespace() + domain;
 
         final Certificate certificate = Certificate.builder()
@@ -70,7 +70,7 @@ public class CertManagerCertificateService implements CertificateService {
                         .dnsNames(Arrays.asList(new String[] { commonName }))
                         .issuerRef(ObjectReferenceSpec.builder().name(issuer)
                                 .build())
-                        .keystores(createKeyStoreSecret(data)).build())
+                        .keystores(createKeyStoreSecret(data, id)).build())
                 .build();
 
         certificateOperation.operation().create(certificate);
@@ -81,12 +81,12 @@ public class CertManagerCertificateService implements CertificateService {
     }
 
     private CertificateKeystoresSpec
-            createKeyStoreSecret(RegisterRequest data) {
+            createKeyStoreSecret(RegisterRequest data, String id) {
 
         final String keyStorePassword = data.getKeyStorePassword();
 
         if (keyStorePassword != null && !"".equals(keyStorePassword)) {
-            String secretName = KEYSTORE_SECRET_PREFIX + data.getName();
+            String secretName = KEYSTORE_SECRET_PREFIX + id;
 
             LOGGER.debug("Secret Keystore creation {} ", secretName);
 

@@ -14,6 +14,6 @@ import io.qiot.covid19.datahub.registration.rest.beans.RegisterResponse;
  **/
 public interface CertificateService {
 
-    public RegisterResponse provision(RegisterRequest registerRequest)
+    public RegisterResponse provision(RegisterRequest registerRequest, String id)
             throws CertificateProvisionException;
 }
