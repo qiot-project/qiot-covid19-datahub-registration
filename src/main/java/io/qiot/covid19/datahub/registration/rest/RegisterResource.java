@@ -57,16 +57,19 @@ public class RegisterResource {
 //        Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(data);
 //        if (!violations.isEmpty()) throw new ValidationException(Arrays.deepToString(violations.toArray()));
 
-        RegisterResponse response = certificateService.provision(data);
+        final String stationId = stationServiceClient.add(data.getSerial(), data.getName(), data.getLongitude(), data.getLatitude());
+        LOGGER.debug(
+                "Successfully provisioned a new station ID ({}) for the registration request \n{}",
+                stationId, data);
+
+        RegisterResponse response = certificateService.provision(data, stationId);
+        
         LOGGER.debug(
                 "Successfully provisioned certificates for the registration request \n{}",
                 data);
 
-        response.setId(stationServiceClient.add(data.getSerial(),
-                data.getName(), data.getLongitude(), data.getLatitude()));
-        LOGGER.debug(
-                "Successfully provisioned a new station ID ({}) for the registration request \n{}",
-                response.getId(), data);
+        response.setId(stationId);
+
 
         LOGGER.debug("Create response: {}", response);
         return response;

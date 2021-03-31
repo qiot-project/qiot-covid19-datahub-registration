@@ -2,7 +2,6 @@ package io.qiot.covid19.datahub.registration.certmanager.client;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -109,14 +108,17 @@ public class CertificateOperation {
                             .inNamespace(namespace)
                             .withName(resource.getSpec().getSecretName())
                             .get();
-            
-                        RegisterResponse registerResponse = RegisterResponse.builder()
-                            .keystore(secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12))
-                            .truststore(secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12))
-                        .build();
-                        em.complete(registerResponse);
-                        LOGGER.debug("Certificate {} is ready: {}", name, resource);
-                        watch.close();
+                        String keystore = secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12);
+                        String truststore = secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12);
+                        if(keystore != null && truststore != null) {
+                            RegisterResponse registerResponse = RegisterResponse.builder()
+                                .keystore(keystore)
+                                .truststore(truststore)
+                            .build();
+                            em.complete(registerResponse);
+                            LOGGER.debug("Certificate {} is ready: {}", name, resource);
+                            watch.close();
+                        }
                     }
                 }
             }
