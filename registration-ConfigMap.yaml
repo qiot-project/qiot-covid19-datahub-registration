@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: server
+data:
+  application.properties: |
+    quarkus.kubernetes-client.namespace=qiotcovid19v2

@@ -1,0 +1,167 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "QioT - Registration Service",
+        "version": "1.0.0",
+        "description": "Registration Service"
+    },
+    "paths": {
+        "/register": {
+            "summary": "Path used to manage the list of registerrequests.",
+            "description": "The REST endpoint/path used to list and create zero or more `RegisterRequest` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
+            "post": {
+                "requestBody": {
+                    "description": "A new `RegisterRequest` to be created.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterResponse"
+                                }
+                            }
+                        },
+                        "description": "Successful response."
+                    }
+                },
+                "operationId": "createRegisterRequest",
+                "summary": "Create a RegisterRequest",
+                "description": "Creates a new instance of a `RegisterRequest`."
+            }
+        },
+        "/register/{id}": {
+            "summary": "Path used to manage a single RegisterRequest.",
+            "description": "The REST endpoint/path used to get, update, and delete single instances of an `RegisterRequest`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterResponse"
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns a single `RegisterResponse`."
+                    }
+                },
+                "operationId": "getRegisterRequest",
+                "summary": "Get a RegisterRequest",
+                "description": "Gets the details of a single instance of a `RegisterRequest`."
+            },
+            "put": {
+                "requestBody": {
+                    "description": "Updated `RegisterRequest` information.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "content": {
+                            "multipart/form-data": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterResponse"
+                                }
+                            }
+                        },
+                        "description": "Successful response."
+                    }
+                },
+                "operationId": "updateRegisterRequest",
+                "summary": "Update a RegisterRequest",
+                "description": "Updates an existing `RegisterRequest`."
+            },
+            "delete": {
+                "responses": {
+                    "204": {
+                        "description": "Successful response."
+                    }
+                },
+                "operationId": "deleteRegisterRequest",
+                "summary": "Delete a RegisterRequest",
+                "description": "Deletes an existing `RegisterRequest`."
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "RegisterRequest": {
+                "title": "Root Type for RegisterRequest",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "serial": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "format": "double",
+                        "type": "number"
+                    },
+                    "latitude": {
+                        "format": "double",
+                        "type": "number"
+                    },
+                    "keyStorePassword": {
+                        "description": "KeyStore Password",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "serial": "some text",
+                    "name": "some text",
+                    "longitude": 3.6,
+                    "latitude": 29.41,
+                    "keyStorePassword": "some text"
+                }
+            },
+            "RegisterResponse": {
+                "description": "",
+                "required": [
+                    "id",
+                    "truststore",
+                    "keystore"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "",
+                        "type": "string"
+                    },
+                    "truststore": {
+                        "format": "byte",
+                        "description": "",
+                        "type": "string"
+                    },
+                    "keystore": {
+                        "format": "byte",
+                        "description": "",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "id": "some text",
+                    "truststore": "<FILE>",
+                    "keystore": "<FILE>"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+##### One way auth
+
+  $ keytool -genkey -keyalg RSA -alias broker -keystore ../certs/broker.ks -storepass 123456 -validity 9999 -dname "CN=ex-aao-mqtt-*-svc-rte-amq-demo.apps.cluster-emeaiot-d864.emeaiot-d864.example.opentlc.com, OU=EMEA Partner Development, O=Red Hat, L=Milan, ST=Milan, C=IT" -ext "SAN=DNS:ex-aao-mqtt-0-svc-rte-amq-demo.apps.cluster-emeaiot-d864.emeaiot-d864.example.opentlc.com,DNS:ex-aao-mqtt-1-svc-rte-amq-demo.apps.cluster-emeaiot-d864.emeaiot-d864.example.opentlc.com"
+  $ keytool -export -alias broker -keystore ../certs/broker.ks -file ../certs/broker_cert.pem -storepass 123456
+  $ keytool -import -alias broker -keystore ../certs/client.ts -file ../certs/broker_cert.pem -storepass 123456
+
+
+
+
+##### Two ways auth
+
+## Create the certificate (Or use the provided ones, skipping down oc create secret generic endpoint-service-tls-secret...)
+
+# 1. Generate a self-signed certificate for the broker key store
+   keytool -genkey -keyalg RSA -alias broker -keystore src/main/resources/certs/https/broker.ks -storepass 123456 -validity 9999 -dname "CN=registration-service-*.apps.cluster-fcd8.fcd8.example.opentlc.com, OU=EMEA Partner Development, O=Red Hat, L=Milan, ST=Milan, C=IT" -ext "SAN=DNS:registration-service-qiotcovid19v2.apps.cluster-fcd8.fcd8.example.opentlc.com,DNS:registration-service-covid19-dev.apps.cluster-fcd8.fcd8.example.opentlc.com,DNS:registration-service-covid19-int.apps.cluster-fcd8.fcd8.example.opentlc.com,DNS:registration-service-covid19-prod.apps.cluster-fcd8.fcd8.example.opentlc.com"
+
+# 2. Export the certificate from the broker key store, so that it can be shared with clients. Export the certificate in the Base64-encoded .pem format
+   keytool -export -alias broker -keystore src/main/resources/certs/https/broker.ks -file src/main/resources/certs/https/broker_cert.pem -storepass 123456
+
+# 3. On the client, create a client trust store that imports the broker certificate
+   keytool -import -alias broker -keystore src/main/resources/certs/https/client.ts -file src/main/resources/certs/https/broker_cert.pem -storepass 123456 -trustcacerts
+
+# 4. On the client, generate a self-signed certificate for the client key store
+   keytool -genkey -alias broker -keyalg RSA -keystore src/main/resources/certs/https/client.ks  -storepass 123456 -validity 9999 -dname "CN=qiot-station, OU=EMEA Partner Development, O=Red Hat, L=Milan, ST=Milan, C=IT"
+
+# 5. On the client, export the certificate from the client key store, so that it can be shared with the broker. Export the certificate in the Base64-encoded .pem format
+   keytool -export -alias broker -keystore src/main/resources/certs/https/client.ks -file src/main/resources/certs/https/client_cert.pem -storepass 123456
+
+# 6. Create a broker trust store that imports the client certificate
+   keytool -import -alias broker -keystore src/main/resources/certs/https/broker.ts -file src/main/resources/certs/https/client_cert.pem -storepass 123456 -trustcacerts
