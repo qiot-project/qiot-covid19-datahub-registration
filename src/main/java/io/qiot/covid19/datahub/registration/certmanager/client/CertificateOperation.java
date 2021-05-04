@@ -108,16 +108,18 @@ public class CertificateOperation {
                             .inNamespace(namespace)
                             .withName(resource.getSpec().getSecretName())
                             .get();
-                        String keystore = secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12);
-                        String truststore = secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12);
-                        if(keystore != null && truststore != null) {
-                            RegisterResponse registerResponse = RegisterResponse.builder()
-                                .keystore(keystore)
-                                .truststore(truststore)
-                            .build();
-                            em.complete(registerResponse);
-                            LOGGER.debug("Certificate {} is ready: {}", name, resource);
-                            watch.close();
+                        if (secret != null) {
+                            String keystore = secret.getData().get(KeystoreSpec.KEYSTORE_KEY_P12);
+                            String truststore = secret.getData().get(KeystoreSpec.TRUSTSTORE_KEY_P12);
+                            if(keystore != null && truststore != null) {
+                                RegisterResponse registerResponse = RegisterResponse.builder()
+                                    .keystore(keystore)
+                                    .truststore(truststore)
+                                .build();
+                                em.complete(registerResponse);
+                                LOGGER.debug("Certificate {} is ready: {}", name, resource);
+                                watch.close();
+                            }
                         }
                     }
                 }
