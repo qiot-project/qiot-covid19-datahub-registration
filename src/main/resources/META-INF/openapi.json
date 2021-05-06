@@ -6,7 +6,7 @@
         "description": "Registration Service"
     },
     "paths": {
-        "/register": {
+        "/v1/register": {
             "summary": "Path used to manage the list of registerrequests.",
             "description": "The REST endpoint/path used to list and create zero or more `RegisterRequest` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
             "post": {
@@ -38,7 +38,7 @@
                 "description": "Creates a new instance of a `RegisterRequest`."
             }
         },
-        "/register/{id}": {
+        "/v1/register/{stationid}": {
             "summary": "Path used to manage a single RegisterRequest.",
             "description": "The REST endpoint/path used to get, update, and delete single instances of an `RegisterRequest`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
             "get": {
